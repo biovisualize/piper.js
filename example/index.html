@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="../dist/piper.js"></script>
+<link rel="stylesheet" href="style.css" charset="utf-8">
+</head>
+<body>
+
+<div class="chart"></div>
+<script>
+// setInterval(function(d){
+//     render();
+// }, 1000);
+
+function render(){
+    var data = d3.range(~~(Math.random() * 20) + 5).map(function(d, i){ return ~~(Math.random() * 100); });
+
+    var eventer = {};
+
+    var chart = piper.areaChart({
+            container: document.querySelector('.chart'),
+            width: 400,
+            height: 300,
+            margin: {top: 100, right: 40, bottom: 100, left: 40},
+            axisTitleX: 'Title X',
+            axisTitleY: 'Title Y',
+            data: data,
+            eventer: eventer
+        });
+
+    eventer.on('mousemove', function(d){ console.log(d); })
+}
+
+render();
+
+</script>
+
+</body>
+</html>
