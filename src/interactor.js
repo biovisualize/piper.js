@@ -41,7 +41,9 @@ piper.events = function(_config){
     };
     piper.utils.override(config, _config);
 
-    d3.rebind(config.eventer, config.dispatch, 'on');
+    if(config.eventer){
+        d3.rebind(config.eventer, config.dispatch, 'on');
+    }
     return {};
 };
 
@@ -140,7 +142,7 @@ piper.tooltipComponent = function(_config){
                 var y = config.scaleY(value);
                 tooltipGroup.attr({transform: 'translate(' + [x, y] + ')'});
                 valueGroup.attr({transform: 'translate(' + [0, y] + ')'});
-                valueLabel.text(d3.round(value, 1));
+                valueLabel.text(value);
                 tooltipLine.attr({
                     x1: 0,
                     y1: y,

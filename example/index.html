@@ -8,7 +8,8 @@
 </head>
 <body>
 
-<div class="chart"></div>
+<div class="chart chart1"></div>
+<div class="chart chart2"></div>
 <script>
 // setInterval(function(d){
 //     render();
@@ -20,7 +21,7 @@ function render(){
     var eventer = {};
 
     var chart = piper.areaChart({
-            container: document.querySelector('.chart'),
+            container: document.querySelector('.chart1'),
             width: 400,
             height: 300,
             margin: {top: 100, right: 40, bottom: 100, left: 40},
@@ -30,7 +31,17 @@ function render(){
             eventer: eventer
         });
 
-    eventer.on('mousemove', function(d){ console.log(d); })
+    eventer.on('mousemove', function(d){ console.log(d); });
+
+    var data = d3.time.hours(new Date('01-01-2016'), new Date('01-02-2016'), 1).map(function(d, i){ return {timestamp: d, value: ~~(Math.random() * 100)}; });
+
+    var chart = piper.areaChartTimeRotated({
+            container: document.querySelector('.chart2'),
+            width: 400,
+            height: 300,
+            margin: {top: 100, right: 40, bottom: 100, left: 40},
+            data: data
+        });
 }
 
 render();

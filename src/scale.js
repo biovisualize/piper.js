@@ -20,6 +20,28 @@ piper.scaleX = function(_config){
     };
 };
 
+piper.scaleXTime = function(_config){
+    var config = {
+        dataConverted: null,
+        margin: null,
+        width: null,
+        scaleType: null
+    };
+    piper.utils.override(config, _config);
+
+    var chartWidth = config.width - config.margin.left - config.margin.right;
+    var dataX = config.dataConverted.map(function(d){ return d.x; });
+
+    var scaleX = d3.time.scale()
+        .domain(d3.extent(dataX))
+        .range([0, chartWidth]);
+
+    return {
+        scaleX: scaleX,
+        chartWidth: chartWidth
+    };
+};
+
 piper.scaleY = function(_config){
     var config = {
         dataConverted: null,

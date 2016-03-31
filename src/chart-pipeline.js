@@ -13,6 +13,39 @@ piper.areaChart = piper.utils.pipeline(
     piper.tooltipComponent
 );
 
+piper.areaChartTime = piper.utils.pipeline(
+    piper.dataTime,
+    piper.scaleXTime,
+    piper.scaleY,
+    piper.axisX,
+    piper.axisY,
+    piper.panelComponent,
+    piper.areaShapes,
+    piper.axisComponentX,
+    piper.axisComponentY,
+    piper.axisTitleComponentX,
+    piper.axisTitleComponentY,
+    piper.axisXFormatterTimeHour,
+    piper.tooltipComponent
+);
+
+piper.areaChartTimeRotated = piper.utils.pipeline(
+    piper.dataTime,
+    piper.scaleXTime,
+    piper.scaleY,
+    piper.axisX,
+    piper.axisY,
+    piper.panelComponent,
+    piper.areaShapes,
+    piper.axisComponentX,
+    piper.axisComponentY,
+    piper.axisTitleComponentX,
+    piper.axisTitleComponentY,
+    piper.axisXFormatterTimeHour,
+    piper.axisXFormatterRotate30,
+    piper.tooltipComponent
+);
+
 piper.lineChart = piper.utils.pipeline(
     piper.data,
     piper.scaleX,

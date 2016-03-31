@@ -63,6 +63,22 @@ piper.data = function(_config) {
     };
 };
 
+piper.dataTime = function(_config) {
+    var config = {
+        data: null
+    };
+    piper.utils.override(config, _config);
+    var dataConverted = config.data.map(function(d, i) {
+        return {
+            x: d.timestamp,
+            y: d.value
+        };
+    });
+    return {
+        dataConverted: dataConverted
+    };
+};
+
 piper.scaleX = function(_config) {
     var config = {
         dataConverted: null,
@@ -76,6 +92,25 @@ piper.scaleX = function(_config) {
         return d.x;
     });
     var scaleX = d3.scale.linear().domain(d3.extent(dataX)).range([ 0, chartWidth ]);
+    return {
+        scaleX: scaleX,
+        chartWidth: chartWidth
+    };
+};
+
+piper.scaleXTime = function(_config) {
+    var config = {
+        dataConverted: null,
+        margin: null,
+        width: null,
+        scaleType: null
+    };
+    piper.utils.override(config, _config);
+    var chartWidth = config.width - config.margin.left - config.margin.right;
+    var dataX = config.dataConverted.map(function(d) {
+        return d.x;
+    });
+    var scaleX = d3.time.scale().domain(d3.extent(dataX)).range([ 0, chartWidth ]);
     return {
         scaleX: scaleX,
         chartWidth: chartWidth
@@ -503,7 +538,9 @@ piper.events = function(_config) {
         dispatch: null
     };
     piper.utils.override(config, _config);
-    d3.rebind(config.eventer, config.dispatch, "on");
+    if (config.eventer) {
+        d3.rebind(config.eventer, config.dispatch, "on");
+    }
     return {};
 };
 
@@ -599,7 +636,7 @@ piper.tooltipComponent = function(_config) {
             valueGroup.attr({
                 transform: "translate(" + [ 0, y ] + ")"
             });
-            valueLabel.text(d3.round(value, 1));
+            valueLabel.text(value);
             tooltipLine.attr({
                 x1: 0,
                 y1: y,
@@ -612,19 +649,46 @@ piper.tooltipComponent = function(_config) {
     return {};
 };
 
-piper.axisXFormatter = function(_config) {
+piper.axisXFormatterTime = function(_config) {
     var config = {
         panel: null,
         dataConverted: null
     };
     piper.utils.override(config, _config);
-    config.panel.select("g.axis.x.single").selectAll(".tick:first-child text").text(function(d) {
+    config.panel.select("g.axis.x").selectAll(".tick text").text(function(d) {
         return d3.time.format("%a")(d);
     });
     return {};
 };
 
+piper.axisXFormatterTimeHour = function(_config) {
+    var config = {
+        panel: null
+    };
+    piper.utils.override(config, _config);
+    config.panel.select("g.axis.x").selectAll(".tick text").text(function(d) {
+        return d3.time.format("%H:%M")(d);
+    });
+    return {};
+};
+
+piper.axisXFormatterRotate30 = function(_config) {
+    var config = {
+        panel: null
+    };
+    piper.utils.override(config, _config);
+    config.panel.select("g.axis.x").selectAll(".tick text").style({
+        transform: "rotate(30deg)",
+        "text-anchor": "start"
+    });
+    return {};
+};
+
 piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.tooltipComponent);
+
+piper.areaChartTime = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.tooltipComponent);
+
+piper.areaChartTimeRotated = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.axisXFormatterRotate30, piper.tooltipComponent);
 
 piper.lineChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.lineShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.tooltipComponent);
 
