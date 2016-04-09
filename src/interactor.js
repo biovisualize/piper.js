@@ -96,6 +96,7 @@ piper.tooltipComponent = function(_config){
         .append('text')
         .attr({
             'class': 'value-label',
+            dx: 2,
             dy: -4
         });
     valueGroup.exit().remove();
@@ -130,15 +131,15 @@ piper.tooltipComponent = function(_config){
             valueGroup.style({visibility: 'hidden'});
             tooltipLine.style({visibility: 'hidden'});
         })
-        .on('mousemove', function(d){
+        .on('mousemove', function(d, i){
             var mouse = d3.mouse(this);
             var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
             var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
             var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
             if(dataPointAtCursor){
-                var date = dataPointAtCursor.x;
+                var xValue = dataPointAtCursor.x;
                 var value = dataPointAtCursor.y;
-                var x = config.scaleX(date);
+                var x = config.scaleX(xValue);
                 var y = config.scaleY(value);
                 tooltipGroup.attr({transform: 'translate(' + [x, y] + ')'});
                 valueGroup.attr({transform: 'translate(' + [0, y] + ')'});

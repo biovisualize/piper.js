@@ -1,8 +1,6 @@
-piper.tresholdLine = function(_config){
+piper.thresholdLine = function(_config){
     var config = {
         panel: null,
-        dataConverted: null,
-        scaleX: null,
         scaleY: null,
         margin: null,
         chartWidth: null,
@@ -15,19 +13,51 @@ piper.tresholdLine = function(_config){
     }
 
     var scaledThresholdY = config.scaleY(config.thresholdY);
-    var path = 'M' + [[config.margin.left, scaledThresholdY], [config.chartWidth, scaledThresholdY]].join('L');
+    var path = 'M' + [[0, scaledThresholdY], [config.chartWidth + 6, scaledThresholdY]].join('L');
 
-    var shapes = config.panel.selectAll('path.treshold')
+    var shapes = config.panel.selectAll('path.threshold')
         .data([0]);
     shapes.enter().append('path')
         .attr({
-            'class': 'treshold shape'
+            'class': 'threshold shape'
         })
         .style({fill: 'none'});
     shapes.attr({
         d: path
     });
     shapes.exit().remove();
+
+    return {};
+};
+
+piper.thresholdLineLabel = function(_config){
+    var config = {
+        panel: null,
+        scaleY: null,
+        margin: null,
+        chartWidth: null,
+        thresholdY: null,
+        thresholdYLabel: null
+    };
+    piper.utils.override(config, _config);
+
+    if(!config.thresholdYLabel){
+        return {};
+    }
+
+    var scaledThresholdY = config.scaleY(config.thresholdY);
+    var path = 'M' + [[0, scaledThresholdY], [config.chartWidth + 6, scaledThresholdY]].join('L');
+
+    var text = config.panel.selectAll('text.threshold-label')
+        .data([0]);
+    text.enter().append('text')
+        .attr({
+            'class': 'threshold-label',
+            x: config.chartWidth + 8,
+            y: scaledThresholdY + 2
+        });
+    text.text(config.thresholdYLabel);
+    text.exit().remove();
 
     return {};
 };

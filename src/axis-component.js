@@ -118,7 +118,7 @@ piper.axisTitleComponentX = function(_config){
         axisTitleX.text(config.axisTitleX || '')
             .attr({
                 x: config.chartWidth - 40,
-                y: config.chartHeight + 40
+                y: config.chartHeight + 35
             });
     axisTitleX.exit().remove();
 
@@ -144,6 +144,31 @@ piper.axisTitleComponentY = function(_config){
                 y: -10
             });
     axisTitleY.exit().remove();
+
+    return {};
+};
+
+piper.chartTitleComponent = function(_config){
+    var config = {
+        panel: null,
+        chartTitle: null,
+        chartHeight: null,
+        chartWidth: null
+    };
+    piper.utils.override(config, _config);
+
+    var axisTitleX = config.panel.selectAll('text.chart-title')
+            .data([0]);
+        axisTitleX.enter().append('text')
+            .attr({
+                'class': 'chart-title'
+            });
+        axisTitleX.text(config.chartTitle || '')
+            .attr({
+                x: function(d){ return (config.chartWidth - this.getBBox().width) / 2; },
+                y: -5
+            });
+    axisTitleX.exit().remove();
 
     return {};
 };

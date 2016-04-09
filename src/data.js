@@ -33,3 +33,25 @@ piper.dataTime = function(_config){
         dataConverted: dataConverted
     };
 };
+
+piper.dataGrouped = function(_config){
+    var config = {
+        data: null
+    };
+    piper.utils.override(config, _config);
+
+    var dataConverted = config.data.map(function(d, i){
+        return {
+            x: i,
+            groupName: d.key,
+            y: d.values.map(function(dB, iB){ return dB.value; })
+        }
+    });
+
+    var dataFlat = d3.merge(dataConverted.map(function(d, i){ return d.y; }));
+
+    return {
+        dataConverted: dataConverted,
+        dataFlat: dataFlat
+    };
+};

@@ -104,9 +104,69 @@ piper.barShapes = function(_config){
         });
     shapes.transition().attr({
         x: function(d){ return config.scaleX(d.x) - barWidth / 2; },
-        y: function(d){ return config.scaleY(d.y); },
+        y: function(d){
+            var barY = config.scaleY(d.y);
+            d.barY = (d.y > 0 && barY === config.chartHeight) ? config.chartHeight - 1 : barY;
+            return d.barY;
+        },
         width: function(d){ return barWidth; },
-        height: function(d){ return config.chartHeight - config.scaleY(d.y); }
+        height: function(d){
+            return config.chartHeight - d.barY;
+        }
+    });
+    shapes.exit().remove();
+
+    return {};
+};
+
+piper.barShapesGrouped = function(_config){
+    var config = {
+        panel: null,
+        dataConverted: null,
+        dataFlat: null,
+        scaleX: null,
+        scaleY: null,
+        chartHeight: null,
+        chartWidth: null,
+        shapePanel: null
+    };
+    piper.utils.override(config, _config);
+    var newConfig = piper.shapePanel(config);
+    piper.utils.override(config, newConfig);
+
+    var barWidth = config.chartWidth / (config.dataFlat.length - 1) / 2;
+    var groupWidth = config.chartWidth / (config.dataConverted.length - 1);
+
+    var groups = config.shapePanel.selectAll('g.shape-group')
+        .data(config.dataConverted);
+    groups.enter().append('g')
+        .attr({
+            'class': 'shape-group'
+        });
+    groups.attr({
+        transform: function(d, i){ return 'translate(' + (groupWidth * i - groupWidth / 4) + ' 0)'; }
+    });
+    groups.exit().remove();
+
+    var shapes = groups.selectAll('rect.bar')
+        .data(function(d){ console.log(d);return d.y; });
+    shapes.enter().append('rect')
+        .attr({
+            'class': 'bar shape'
+        });
+    shapes.transition().attr({
+        x: function(d, i){return barWidth * i; },
+        y: function(d){
+            var barY = config.scaleY(d);
+            barY = (d && d > 0 && barY === config.chartHeight) ? config.chartHeight - 1 : barY;
+            return barY;
+        },
+        width: function(d){ return barWidth; },
+        height: function(d){
+            var barY = config.scaleY(d);
+            barY = (d && d > 0 && barY === config.chartHeight) ? config.chartHeight - 1 : barY;
+            return config.chartHeight - barY;
+        }
     });
     shapes.exit().remove();
 

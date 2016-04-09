@@ -23,7 +23,7 @@ piper.axisXFormatterTimeHour = function(_config){
     config.panel.select('g.axis.x')
         .selectAll('.tick text')
         .text(function(d){
-            return d3.time.format('%H:%M')(d);
+            return d3.time.format('%x')(d);
         });
 
     return {};

@@ -18,17 +18,16 @@ piper.axisX = function(_config){
 
 piper.axisY = function(_config){
     var config = {
-        scaleY: null,
-        chartWidth: null,
-        margin: null,
-        axisYPadding: 0
+        scaleY: null
     };
     piper.utils.override(config, _config);
+
+    var height = config.scaleY.range()[0];
 
     var axisY = d3.svg.axis()
         .scale(config.scaleY)
         .orient('left')
-        .ticks(6, 's')
+        .ticks(Math.max(~~(height / 30), 2), '.s3')
         .tickPadding(10);
 
     return {
