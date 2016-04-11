@@ -11,6 +11,7 @@ piper.utils = {
                 config = that.mergeAll(config, cache);
 //                    console.log(i, 'after', config);
             }
+            return config;
         };
     },
     override: function(_objA, _objB){ for(var x in _objB){ if(x in _objA){ _objA[x] = _objB[x]; } } },
@@ -32,5 +33,45 @@ piper.utils = {
             this.merge(newObj, objs[i]);
         }
         return newObj;
-    }
+    },
+
+    // from https://github.com/curran/reactive-property
+    reactiveProperty: function (value){
+        var listeners;
+
+        function property(newValue) {
+            if (arguments.length === 1) {
+                value = newValue;
+                if (listeners) {
+                    for (var i = 0; i < listeners.length; i++) {
+                        listeners[i](value);
+                    }
+                }
+                return this;
+            }
+            return value;
+        }
+
+        property.on = function(listener) {
+            if (!listeners) {
+                listeners = [];
+            }
+            listeners.push(listener);
+            if (typeof(value) !== "undefined" && value !== null) {
+                listener(value);
+            }
+            return listener;
+        };
+
+        property.off = function(listenerToRemove) {
+            if (listeners) {
+                listeners = listeners.filter(function(listener) {
+                    return listener !== listenerToRemove;
+                });
+            }
+        };
+
+    return property;
+
+  }
 };

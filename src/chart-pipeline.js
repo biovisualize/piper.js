@@ -45,7 +45,9 @@ piper.areaChartTimeRotated = piper.utils.pipeline(
     piper.chartTitleComponent,
     piper.axisXFormatterTimeHour,
     piper.axisXFormatterRotate30,
-    piper.tooltipComponent
+    piper.hoverEvents,
+    piper.HTMLTooltip,
+    piper.hoverCircle
 );
 
 piper.areaChartFrom0 = piper.utils.pipeline(
@@ -136,7 +138,7 @@ piper.barChartGroupedPrumo = piper.utils.pipeline(
     piper.thresholdLineLabel,
     piper.axisTitleComponentY,
     piper.chartTitleComponent,
-    piper.tooltipComponent
+    piper.hoverEvents
 );
 
 piper.singleAxis = piper.utils.pipeline(

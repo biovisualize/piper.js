@@ -31,7 +31,7 @@ piper.eventCatchingLayer = function(_config){
             'pointer-events': 'all'
         });
 
-    return {eventPanel: eventPanel, dispatch: dispatch};
+    return {eventPanel: eventPanel};
 };
 
 piper.events = function(_config){
@@ -45,6 +45,64 @@ piper.events = function(_config){
         d3.rebind(config.eventer, config.dispatch, 'on');
     }
     return {};
+};
+
+piper.hoverEvents = function(_config){
+    var config = {
+        container: null,
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        chartWidth: null,
+        chartHeight: null,
+        eventPanel: null
+    };
+    piper.utils.override(config, _config);
+    piper.utils.override(config, piper.eventCatchingLayer(config));
+
+    var mousemove = piper.utils.reactiveProperty();
+    var mouseenter = piper.utils.reactiveProperty();
+    var mouseout = piper.utils.reactiveProperty();
+
+    var dataConvertedX = config.dataConverted.map(function(d){ return d.x; });
+    var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0]);
+
+    config.eventPanel
+        .on('mouseenter', function(d){
+            mouseenter({mouse: d3.mouse(this)});
+        })
+        .on('mouseout', function(d){
+            mouseout({mouse: d3.mouse(this)});
+        })
+        .on('mousemove', function(d, i){
+            var mouse = d3.mouse(this);
+            var mouseFromContainer = d3.mouse(config.container);
+            var panelBBox = this.getBoundingClientRect();
+            var containerBBox = config.container.getBoundingClientRect();
+            var absoluteOffsetLeft = containerBBox.left;
+            var absoluteOffsetTop = containerBBox.top;
+
+            var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
+            var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
+            var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
+            if(dataPointAtCursor){
+                var xValue = dataPointAtCursor.x;
+                var value = dataPointAtCursor.y;
+                var x = config.scaleX(xValue);
+                var y = config.scaleY(value);
+            }
+
+            mousemove({
+                data: dataPointAtCursor, 
+                mouse: mouse, 
+                mouseFromContainer: [mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset], 
+                shapePosition: [x, y],
+                shapePositionFromContainer: [x + panelBBox.left, y + panelBBox.top + window.pageYOffset]
+            });
+        });
+
+    return {mousemove: mousemove, mouseenter: mouseenter, mouseout: mouseout};
 };
 
 piper.tooltipComponent = function(_config){

@@ -149,7 +149,7 @@ piper.barShapesGrouped = function(_config){
     groups.exit().remove();
 
     var shapes = groups.selectAll('rect.bar')
-        .data(function(d){ console.log(d);return d.y; });
+        .data(function(d){ return d.y; });
     shapes.enter().append('rect')
         .attr({
             'class': 'bar shape'
