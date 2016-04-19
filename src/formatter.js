@@ -44,3 +44,18 @@ piper.axisXFormatterRotate30 = function(_config){
 
     return {};
 };
+
+piper.axisYFormatSI = function(_config){
+    var config = {
+        axisY: null
+    };
+    piper.utils.override(config, _config);
+
+    config.axisY.tickFormat(function(d){
+        var prefix = d3.formatPrefix(d);
+        var value = prefix.scale(d).toFixed();
+        return value + prefix.symbol;
+    });
+
+    return {};
+};

@@ -110,16 +110,16 @@ piper.axisTitleComponentX = function(_config){
     piper.utils.override(config, _config);
 
     var axisTitleX = config.panel.selectAll('text.axis-title.x')
-            .data([0]);
-        axisTitleX.enter().append('text')
-            .attr({
-                'class': 'x axis-title'
-            });
-        axisTitleX.text(config.axisTitleX || '')
-            .attr({
-                x: config.chartWidth - 40,
-                y: config.chartHeight + 35
-            });
+        .data([0]);
+    axisTitleX.enter().append('text')
+        .attr({
+            'class': 'x axis-title'
+        });
+    axisTitleX.text(config.axisTitleX || '')
+        .attr({
+            x: config.chartWidth,
+            y: config.chartHeight
+        });
     axisTitleX.exit().remove();
 
     return {};
@@ -133,16 +133,16 @@ piper.axisTitleComponentY = function(_config){
     piper.utils.override(config, _config);
 
     var axisTitleY = config.panel.selectAll('text.axis-title.y')
-            .data([0]);
-        axisTitleY.enter().append('text')
-            .attr({
-                'class': 'y axis-title'
-            });
-        axisTitleY.text(config.axisTitleY || '')
-            .attr({
-                x: -40,
-                y: -10
-            });
+        .data([0]);
+    axisTitleY.enter().append('text')
+        .attr({
+            'class': 'y axis-title'
+        });
+    axisTitleY.text(config.axisTitleY || '')
+        .attr({
+            x: -40,
+            y: -10
+        });
     axisTitleY.exit().remove();
 
     return {};
@@ -152,22 +152,21 @@ piper.chartTitleComponent = function(_config){
     var config = {
         panel: null,
         chartTitle: null,
-        chartHeight: null,
         chartWidth: null
     };
     piper.utils.override(config, _config);
 
     var axisTitleX = config.panel.selectAll('text.chart-title')
-            .data([0]);
-        axisTitleX.enter().append('text')
-            .attr({
-                'class': 'chart-title'
-            });
-        axisTitleX.text(config.chartTitle || '')
-            .attr({
-                x: function(d){ return (config.chartWidth - this.getBBox().width) / 2; },
-                y: -5
-            });
+        .data([0]);
+    axisTitleX.enter().append('text')
+        .attr({
+            'class': 'chart-title'
+        });
+    axisTitleX.text(config.chartTitle || '')
+        .attr({
+            x: function(d){ return (config.chartWidth - config.chartTitle.length * 5) / 2; },
+            y: -5
+        });
     axisTitleX.exit().remove();
 
     return {};

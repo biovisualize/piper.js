@@ -368,8 +368,8 @@ piper.axisTitleComponentX = function(_config) {
         "class": "x axis-title"
     });
     axisTitleX.text(config.axisTitleX || "").attr({
-        x: config.chartWidth - 40,
-        y: config.chartHeight + 35
+        x: config.chartWidth,
+        y: config.chartHeight
     });
     axisTitleX.exit().remove();
     return {};
@@ -397,7 +397,6 @@ piper.chartTitleComponent = function(_config) {
     var config = {
         panel: null,
         chartTitle: null,
-        chartHeight: null,
         chartWidth: null
     };
     piper.utils.override(config, _config);
@@ -407,7 +406,7 @@ piper.chartTitleComponent = function(_config) {
     });
     axisTitleX.text(config.chartTitle || "").attr({
         x: function(d) {
-            return (config.chartWidth - this.getBBox().width) / 2;
+            return (config.chartWidth - config.chartTitle.length * 5) / 2;
         },
         y: -5
     });
@@ -418,7 +417,8 @@ piper.chartTitleComponent = function(_config) {
 piper.tooltipWidget = function(tooltipNode) {
     var root = d3.select(tooltipNode).style({
         position: "absolute",
-        "pointer-events": "none"
+        "pointer-events": "none",
+        display: "none"
     });
     var setText = function(html) {
         root.html(html);
@@ -443,11 +443,15 @@ piper.tooltipWidget = function(tooltipNode) {
         });
         return this;
     };
+    var getRootNode = function() {
+        return root.node();
+    };
     return {
         setText: setText,
         setPosition: position,
         show: show,
-        hide: hide
+        hide: hide,
+        getRootNode: getRootNode
     };
 };
 
@@ -560,8 +564,8 @@ piper.HTMLTooltip = function(_config) {
     tooltipContainer.enter().append("div").classed("tooltip", true);
     var tooltip = piper.tooltipWidget(tooltipContainer.node());
     config.mousemove.on(function(d) {
-        var pos = d.shapePositionFromContainer;
-        tooltip.setPosition([ pos[0] + 10, pos[1] - 10 ]).setText(d.data.y);
+        var pos = d.shapePositionFromContainer2;
+        tooltip.setPosition([ pos[0], pos[1] ]).setText(d.data.y);
     });
     config.mouseenter.on(function(d) {
         tooltip.show();
@@ -593,7 +597,8 @@ piper.hoverCircle = function(_config) {
         var root = d3.select(circleNode).attr({
             r: 4
         }).style({
-            "pointer-events": "none"
+            "pointer-events": "none",
+            display: "none"
         });
         var position = function(pos) {
             root.attr({
@@ -920,7 +925,8 @@ piper.hoverEvents = function(_config) {
             mouse: mouse,
             mouseFromContainer: [ mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset ],
             shapePosition: [ x, y ],
-            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ]
+            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ],
+            shapePositionFromContainer2: [ x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top ]
         });
     });
     return {
@@ -1071,7 +1077,20 @@ piper.axisXFormatterRotate30 = function(_config) {
     return {};
 };
 
-piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
+piper.axisYFormatSI = function(_config) {
+    var config = {
+        axisY: null
+    };
+    piper.utils.override(config, _config);
+    config.axisY.tickFormat(function(d) {
+        var prefix = d3.formatPrefix(d);
+        var value = prefix.scale(d).toFixed();
+        return value + prefix.symbol;
+    });
+    return {};
+};
+
+piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.axisYFormatSI, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
 
 piper.areaChartTime = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.tooltipComponent);
 

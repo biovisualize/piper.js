@@ -2,7 +2,8 @@ piper.tooltipWidget = function(tooltipNode) {
     var root = d3.select(tooltipNode)
         .style({
             position: 'absolute',
-            'pointer-events': 'none'
+            'pointer-events': 'none',
+            display: 'none'
         });
     var setText = function(html) {
         root.html(html);
@@ -27,11 +28,15 @@ piper.tooltipWidget = function(tooltipNode) {
         });
         return this;
     };
+    var getRootNode = function(){
+        return root.node();
+    }
 
     return {
         setText: setText,
         setPosition: position,
         show: show,
-        hide: hide
+        hide: hide,
+        getRootNode: getRootNode
     };
 };

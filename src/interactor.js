@@ -98,7 +98,8 @@ piper.hoverEvents = function(_config){
                 mouse: mouse, 
                 mouseFromContainer: [mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset], 
                 shapePosition: [x, y],
-                shapePositionFromContainer: [x + panelBBox.left, y + panelBBox.top + window.pageYOffset]
+                shapePositionFromContainer: [x + panelBBox.left, y + panelBBox.top + window.pageYOffset],
+                shapePositionFromContainer2: [x + panelBBox.left - containerBBox.left, y  + panelBBox.top - containerBBox.top]
             });
         });
 

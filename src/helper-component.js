@@ -132,9 +132,12 @@ piper.HTMLTooltip = function(_config){
     var tooltip = piper.tooltipWidget(tooltipContainer.node());
 
     config.mousemove.on(function(d){
-        var pos = d.shapePositionFromContainer;
+        // var pos = d.shapePositionFromContainer;
+        var pos = d.shapePositionFromContainer2;
         // var pos = d.mouseFromContainer;
-        tooltip.setPosition([pos[0] + 10, pos[1] - 10]).setText(d.data.y);
+        // var pos = d.mouse;
+        // var pos = d.shapePosition;
+        tooltip.setPosition([pos[0], pos[1]]).setText(d.data.y);
     });
     config.mouseenter.on(function(d){ tooltip.show(); });
     config.mouseout.on(function(d){ tooltip.hide(); });
@@ -166,7 +169,8 @@ piper.hoverCircle = function(_config){
                 r: 4
             })
             .style({
-                'pointer-events': 'none'
+                'pointer-events': 'none',
+                display: 'none'
             });
         var position = function(pos) {
             root.attr({

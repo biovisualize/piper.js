@@ -4,6 +4,7 @@ piper.areaChart = piper.utils.pipeline(
     piper.scaleY,
     piper.axisX,
     piper.axisY,
+    piper.axisYFormatSI,
     piper.panelComponent,
     piper.areaShapes,
     piper.axisComponentX,
