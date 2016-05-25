@@ -128,3 +128,15 @@ piper.scaleYFrom0Padded = function(_config){
         chartHeight: chartHeight
     };
 };
+
+piper.scaleYExtent = function(_config){
+    var config = {
+        extentY: null,
+        scaleY: null
+    };
+    piper.utils.override(config, _config);
+
+    config.scaleY.domain(config.extentY);
+
+    return {};
+};

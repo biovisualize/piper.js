@@ -105,109 +105,147 @@ piper.verticalLine = function(_config){
     return {};
 };
 
-piper.HTMLTooltip = function(_config){
+piper.tooltipComponent = function(_config){
     var config = {
         container: null,
         panel: null,
         dataConverted: null,
         scaleX: null,
         scaleY: null,
-        eventPanel: null,
-        mousemove: null,
-        mouseenter: null,
-        mouseout: null,
+        events: null,
         chartWidth: null,
         chartHeight: null
     };
     piper.utils.override(config, _config);
-    if(!config.mousemove){
-        piper.utils.override(config, piper.hoverEvents(config));
-    }
+    piper.utils.override(config, piper.eventsBinder(config));
 
-    var tooltipContainer = d3.select(config.container)
-        .selectAll('div.tooltip')
+    var tooltipContainer = config.panel
+        .selectAll('g.hover-tooltip')
         .data([0]);
-    tooltipContainer.enter().append('div').classed('tooltip', true);
+    tooltipContainer.enter().append('g').classed('hover-tooltip', true)
+        .attr({
+            r: 4
+        })
+        .style({
+            'pointer-events': 'none',
+            display: 'none'
+        })
+        .append('text');
+    tooltipContainer.exit().remove();
 
-    var tooltip = piper.tooltipWidget(tooltipContainer.node());
-
-    config.mousemove.on(function(d){
-        // var pos = d.shapePositionFromContainer;
-        var pos = d.shapePositionFromContainer2;
-        // var pos = d.mouseFromContainer;
-        // var pos = d.mouse;
-        // var pos = d.shapePosition;
-        tooltip.setPosition([pos[0], pos[1]]).setText(d.data.y);
+    config.events.mousemove.on(function(d){
+        tooltipContainer.attr({
+            transform: 'translate(' + d.shapePosition + ')'
+        })
+        .select('text').text(d.data.y);
     });
-    config.mouseenter.on(function(d){ tooltip.show(); });
-    config.mouseout.on(function(d){ tooltip.hide(); });
+    config.events.mouseenter.on(function(d){
+        tooltipContainer.style({
+            display: 'block'
+        });
+    });
+    config.events.mouseout.on(function(d){
+        tooltipContainer.style({
+            display: 'none'
+        });
+    });
 
     return {};
 };
 
-piper.hoverCircle = function(_config){
+piper.hoverCircleComponent = function(_config){
     var config = {
+        container: null,
         panel: null,
         dataConverted: null,
         scaleX: null,
         scaleY: null,
-        eventPanel: null,
-        mousemove: null,
-        mouseenter: null,
-        mouseout: null,
+        events: null,
         chartWidth: null,
         chartHeight: null
     };
     piper.utils.override(config, _config);
-    if(!config.mousemove){
-        piper.utils.override(config, piper.hoverEvents(config));
-    }
-
-    var circleComponent = function(circleNode) {
-        var root = d3.select(circleNode)
-            .attr({
-                r: 4
-            })
-            .style({
-                'pointer-events': 'none',
-                display: 'none'
-            });
-        var position = function(pos) {
-            root.attr({
-                transform: 'translate(' + pos + ')'
-            });
-            return this;
-        };
-        var show = function() {
-            root.style({
-                display: 'block'
-            });
-            return this;
-        };
-        var hide = function() {
-            root.style({
-                display: 'none'
-            });
-            return this;
-        };
-
-        return {
-            setPosition: position,
-            show: show,
-            hide: hide
-        };
-    };
+    piper.utils.override(config, piper.eventsBinder(config));
 
     var circleContainer = config.panel
-        .selectAll('circle.hover')
+        .selectAll('circle.hover-circle')
         .data([0]);
-    circleContainer.enter().append('circle').classed('hover', true);
+    circleContainer.enter().append('circle').classed('hover-circle', true)
+        .attr({
+            r: 4
+        })
+        .style({
+            'pointer-events': 'none',
+            display: 'none'
+        });
+    circleContainer.exit().remove();
 
-    var tooltip = circleComponent(circleContainer.node());
+    config.events.mousemove.on(function(d){
+        circleContainer.attr({
+            transform: 'translate(' + d.shapePosition + ')'
+        });
+    });
+    config.events.mouseenter.on(function(d){
+        circleContainer.style({
+            display: 'block'
+        });
+    });
+    config.events.mouseout.on(function(d){
+        circleContainer.style({
+            display: 'none'
+        });
+    });
 
-    config.mousemove.on(function(d){ tooltip.setPosition(d.shapePosition); });
-    config.mouseenter.on(function(d){ tooltip.show(); });
-    config.mouseout.on(function(d){ tooltip.hide(); });
+    return {};
+};
+
+piper.tooltipLineComponent = function(_config){
+    var config = {
+        container: null,
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        events: null,
+        chartWidth: null,
+        chartHeight: null
+    };
+    piper.utils.override(config, _config);
+    piper.utils.override(config, piper.eventsBinder(config));
+
+    var lineGroup = config.panel
+        .selectAll('g.line-container')
+        .data([0]);
+    lineGroup.enter().append('g')
+        .attr({
+            'class': 'line-container',
+            'pointer-events': 'none'
+        })
+        .style({visibility: 'hidden'})
+        .append('line')
+        .attr({
+            'class': 'tooltip-line'
+        });
+    lineGroup.exit().remove();
+
+    var tooltipLine = lineGroup.select('.tooltip-line');
+
+    config.events.mouseenter.on(function(d){
+        tooltipLine.style({visibility: 'visible'});
+    });
+    config.events.mouseout.on(function(d){
+        tooltipLine.style({visibility: 'hidden'});
+    });
+    config.events.mousemove.on(function(d){
+        var x = d.shapePosition[0];
+        var y = d.shapePosition[1];
+        tooltipLine.attr({
+            x1: 0,
+            y1: y,
+            x2: x,
+            y2: y
+        });
+    });
 
     return {};
 };

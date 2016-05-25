@@ -10,6 +10,8 @@
 
 <div class="chart chart1"></div>
 <div class="chart chart2"></div>
+<div class="chart chart3"></div>
+<div class="tooltip">test</div>
 <script>
 // setInterval(function(d){
 //     render();
@@ -18,30 +20,53 @@
 function render(){
     var data = d3.range(~~(Math.random() * 20) + 5).map(function(d, i){ return ~~(Math.random() * 100); });
 
-    var eventer = {};
+    var lineChart = piper.utils.pipeline(
+        piper.data,
+        piper.scaleX,
+        piper.scaleY,
+        piper.axisX,
+        piper.axisY,
+        piper.panelComponent,
+        piper.lineShapes,
+        piper.axisComponentX,
+        piper.axisComponentY,
+        piper.axisTitleComponentX,
+        piper.axisTitleComponentY,
+        piper.chartTitleComponent,
+        piper.eventsBinder,
+        piper.tooltipLineComponent,
+        piper.hoverCircleComponent,
+        piper.tooltipComponent
+    );
 
-    var chart = piper.areaChart({
-            container: document.querySelector('.chart1'),
+    var chartContainer = document.querySelector('.chart3');
+
+    var chart = lineChart({
+            container: chartContainer,
             width: 400,
-            height: 300,
-            margin: {top: 100, right: 40, bottom: 100, left: 40},
+            height: 200,
+            margin: {top: 50, right: 70, bottom: 35, left: 60},
+            data: data,
             axisTitleX: 'Title X',
             axisTitleY: 'Title Y',
-            data: data,
-            eventer: eventer
+            chartTitle: 'Chart'
         });
 
-    eventer.on('mousemove', function(d){ console.log(d); });
+    var tooltip = piper.tooltipHTMLWidget(document.querySelector('.tooltip'));
 
-    var data = d3.time.hours(new Date('01-01-2016'), new Date('01-02-2016'), 1).map(function(d, i){ return {timestamp: d, value: ~~(Math.random() * 100)}; });
+    chart.events.mouseenter.on(function(d){
+        tooltip.show();
+    });
+    chart.events.mouseout.on(function(d){
+        tooltip.hide();
+    });
+    chart.events.mousemove.on(function(d){
+        var chartPosition = chartContainer.getBoundingClientRect();
+        tooltip
+            .setText(d.data.y)
+            .setPosition([d.shapePositionFromContainer[0] + chartPosition.left, d.shapePositionFromContainer[1] + chartPosition.top]);
+    });
 
-    var chart = piper.areaChartTimeRotated({
-            container: document.querySelector('.chart2'),
-            width: 400,
-            height: 300,
-            margin: {top: 100, right: 40, bottom: 100, left: 40},
-            data: data
-        });
 }
 
 render();

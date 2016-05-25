@@ -249,6 +249,16 @@ piper.scaleYFrom0Padded = function(_config) {
     };
 };
 
+piper.scaleYExtent = function(_config) {
+    var config = {
+        extentY: null,
+        scaleY: null
+    };
+    piper.utils.override(config, _config);
+    config.scaleY.domain(config.extentY);
+    return {};
+};
+
 piper.axisX = function(_config) {
     var config = {
         scaleX: null,
@@ -414,7 +424,7 @@ piper.chartTitleComponent = function(_config) {
     return {};
 };
 
-piper.tooltipWidget = function(tooltipNode) {
+piper.tooltipHTMLWidget = function(tooltipNode) {
     var root = d3.select(tooltipNode).style({
         position: "absolute",
         "pointer-events": "none",
@@ -542,99 +552,127 @@ piper.verticalLine = function(_config) {
     return {};
 };
 
-piper.HTMLTooltip = function(_config) {
+piper.tooltipComponent = function(_config) {
     var config = {
         container: null,
         panel: null,
         dataConverted: null,
         scaleX: null,
         scaleY: null,
-        eventPanel: null,
-        mousemove: null,
-        mouseenter: null,
-        mouseout: null,
+        events: null,
         chartWidth: null,
         chartHeight: null
     };
     piper.utils.override(config, _config);
-    if (!config.mousemove) {
-        piper.utils.override(config, piper.hoverEvents(config));
-    }
-    var tooltipContainer = d3.select(config.container).selectAll("div.tooltip").data([ 0 ]);
-    tooltipContainer.enter().append("div").classed("tooltip", true);
-    var tooltip = piper.tooltipWidget(tooltipContainer.node());
-    config.mousemove.on(function(d) {
-        var pos = d.shapePositionFromContainer2;
-        tooltip.setPosition([ pos[0], pos[1] ]).setText(d.data.y);
+    piper.utils.override(config, piper.eventsBinder(config));
+    var tooltipContainer = config.panel.selectAll("g.hover-tooltip").data([ 0 ]);
+    tooltipContainer.enter().append("g").classed("hover-tooltip", true).attr({
+        r: 4
+    }).style({
+        "pointer-events": "none",
+        display: "none"
+    }).append("text");
+    tooltipContainer.exit().remove();
+    config.events.mousemove.on(function(d) {
+        tooltipContainer.attr({
+            transform: "translate(" + d.shapePosition + ")"
+        }).select("text").text(d.data.y);
     });
-    config.mouseenter.on(function(d) {
-        tooltip.show();
+    config.events.mouseenter.on(function(d) {
+        tooltipContainer.style({
+            display: "block"
+        });
     });
-    config.mouseout.on(function(d) {
-        tooltip.hide();
+    config.events.mouseout.on(function(d) {
+        tooltipContainer.style({
+            display: "none"
+        });
     });
     return {};
 };
 
-piper.hoverCircle = function(_config) {
+piper.hoverCircleComponent = function(_config) {
     var config = {
+        container: null,
         panel: null,
         dataConverted: null,
         scaleX: null,
         scaleY: null,
-        eventPanel: null,
-        mousemove: null,
-        mouseenter: null,
-        mouseout: null,
+        events: null,
         chartWidth: null,
         chartHeight: null
     };
     piper.utils.override(config, _config);
-    if (!config.mousemove) {
-        piper.utils.override(config, piper.hoverEvents(config));
-    }
-    var circleComponent = function(circleNode) {
-        var root = d3.select(circleNode).attr({
-            r: 4
-        }).style({
-            "pointer-events": "none",
+    piper.utils.override(config, piper.eventsBinder(config));
+    var circleContainer = config.panel.selectAll("circle.hover-circle").data([ 0 ]);
+    circleContainer.enter().append("circle").classed("hover-circle", true).attr({
+        r: 4
+    }).style({
+        "pointer-events": "none",
+        display: "none"
+    });
+    circleContainer.exit().remove();
+    config.events.mousemove.on(function(d) {
+        circleContainer.attr({
+            transform: "translate(" + d.shapePosition + ")"
+        });
+    });
+    config.events.mouseenter.on(function(d) {
+        circleContainer.style({
+            display: "block"
+        });
+    });
+    config.events.mouseout.on(function(d) {
+        circleContainer.style({
             display: "none"
         });
-        var position = function(pos) {
-            root.attr({
-                transform: "translate(" + pos + ")"
-            });
-            return this;
-        };
-        var show = function() {
-            root.style({
-                display: "block"
-            });
-            return this;
-        };
-        var hide = function() {
-            root.style({
-                display: "none"
-            });
-            return this;
-        };
-        return {
-            setPosition: position,
-            show: show,
-            hide: hide
-        };
+    });
+    return {};
+};
+
+piper.tooltipLineComponent = function(_config) {
+    var config = {
+        container: null,
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        events: null,
+        chartWidth: null,
+        chartHeight: null
     };
-    var circleContainer = config.panel.selectAll("circle.hover").data([ 0 ]);
-    circleContainer.enter().append("circle").classed("hover", true);
-    var tooltip = circleComponent(circleContainer.node());
-    config.mousemove.on(function(d) {
-        tooltip.setPosition(d.shapePosition);
+    piper.utils.override(config, _config);
+    piper.utils.override(config, piper.eventsBinder(config));
+    var lineGroup = config.panel.selectAll("g.line-container").data([ 0 ]);
+    lineGroup.enter().append("g").attr({
+        "class": "line-container",
+        "pointer-events": "none"
+    }).style({
+        visibility: "hidden"
+    }).append("line").attr({
+        "class": "tooltip-line"
     });
-    config.mouseenter.on(function(d) {
-        tooltip.show();
+    lineGroup.exit().remove();
+    var tooltipLine = lineGroup.select(".tooltip-line");
+    config.events.mouseenter.on(function(d) {
+        tooltipLine.style({
+            visibility: "visible"
+        });
     });
-    config.mouseout.on(function(d) {
-        tooltip.hide();
+    config.events.mouseout.on(function(d) {
+        tooltipLine.style({
+            visibility: "hidden"
+        });
+    });
+    config.events.mousemove.on(function(d) {
+        var x = d.shapePosition[0];
+        var y = d.shapePosition[1];
+        tooltipLine.attr({
+            x1: 0,
+            y1: y,
+            x2: x,
+            y2: y
+        });
     });
     return {};
 };
@@ -837,46 +875,13 @@ piper.endCircle = function(_config) {
     return {};
 };
 
-piper.eventCatchingLayer = function(_config) {
-    var config = {
-        panel: null,
-        chartWidth: null,
-        chartHeight: null
-    };
-    piper.utils.override(config, _config);
-    var dispatch = d3.dispatch("mousemove");
-    var eventPanelContainer = config.panel.selectAll("g.event-panel-container").data([ 0 ]);
-    eventPanelContainer.enter().append("g").attr({
-        "class": "event-panel-container"
-    }).append("rect").attr({
-        "class": "event-panel"
-    });
-    eventPanelContainer.exit().remove();
-    var eventPanel = eventPanelContainer.select(".event-panel").attr({
-        width: config.chartWidth,
-        height: config.chartHeight
-    }).style({
-        visibility: "hidden",
-        "pointer-events": "all"
-    });
-    return {
-        eventPanel: eventPanel
-    };
+piper.events = {
+    mousemove: piper.utils.reactiveProperty(),
+    mouseenter: piper.utils.reactiveProperty(),
+    mouseout: piper.utils.reactiveProperty()
 };
 
-piper.events = function(_config) {
-    var config = {
-        eventer: null,
-        dispatch: null
-    };
-    piper.utils.override(config, _config);
-    if (config.eventer) {
-        d3.rebind(config.eventer, config.dispatch, "on");
-    }
-    return {};
-};
-
-piper.hoverEvents = function(_config) {
+piper.eventsBinder = function(_config) {
     var config = {
         container: null,
         panel: null,
@@ -884,24 +889,30 @@ piper.hoverEvents = function(_config) {
         scaleX: null,
         scaleY: null,
         chartWidth: null,
-        chartHeight: null,
-        eventPanel: null
+        chartHeight: null
     };
     piper.utils.override(config, _config);
-    piper.utils.override(config, piper.eventCatchingLayer(config));
-    var mousemove = piper.utils.reactiveProperty();
-    var mouseenter = piper.utils.reactiveProperty();
-    var mouseout = piper.utils.reactiveProperty();
     var dataConvertedX = config.dataConverted.map(function(d) {
         return d.x;
     });
     var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0]);
-    config.eventPanel.on("mouseenter", function(d) {
-        mouseenter({
+    var eventPanelContainer = config.panel.selectAll("g.event-panel-container").data([ 0 ]);
+    eventPanelContainer.enter().append("g").attr({
+        "class": "event-panel-container"
+    }).append("rect").attr({
+        "class": "event-panel"
+    }).attr({
+        width: config.chartWidth,
+        height: config.chartHeight
+    }).style({
+        visibility: "hidden",
+        "pointer-events": "all"
+    }).on("mouseenter", function(d) {
+        piper.events.mouseenter({
             mouse: d3.mouse(this)
         });
     }).on("mouseout", function(d) {
-        mouseout({
+        piper.events.mouseout({
             mouse: d3.mouse(this)
         });
     }).on("mousemove", function(d, i) {
@@ -920,126 +931,18 @@ piper.hoverEvents = function(_config) {
             var x = config.scaleX(xValue);
             var y = config.scaleY(value);
         }
-        mousemove({
+        piper.events.mousemove({
             data: dataPointAtCursor,
             mouse: mouse,
             mouseFromContainer: [ mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset ],
             shapePosition: [ x, y ],
-            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ],
-            shapePositionFromContainer2: [ x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top ]
+            shapePositionFromContainer: [ x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top ]
         });
     });
+    eventPanelContainer.exit().remove();
     return {
-        mousemove: mousemove,
-        mouseenter: mouseenter,
-        mouseout: mouseout
+        events: piper.events
     };
-};
-
-piper.tooltipComponent = function(_config) {
-    var config = {
-        panel: null,
-        dataConverted: null,
-        scaleX: null,
-        scaleY: null,
-        eventPanel: null,
-        chartWidth: null,
-        chartHeight: null,
-        dispatch: null,
-        eventer: null
-    };
-    piper.utils.override(config, _config);
-    var newConfig = piper.eventCatchingLayer(config);
-    piper.utils.override(config, newConfig);
-    newConfig = piper.events(config);
-    piper.utils.override(config, newConfig);
-    var dataConvertedX = config.dataConverted.map(function(d) {
-        return d.x;
-    });
-    var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0]);
-    var tooltipGroup = config.panel.selectAll("g.tooltip-container").data([ 0 ]);
-    tooltipGroup.enter().append("g").attr({
-        "class": "tooltip-container",
-        "pointer-events": "none"
-    }).style({
-        visibility: "hidden"
-    }).append("circle").attr({
-        "class": "tooltip-circle",
-        r: 3
-    });
-    tooltipGroup.exit().remove();
-    var valueGroup = config.panel.selectAll("g.value-container").data([ 0 ]);
-    valueGroup.enter().append("g").attr({
-        "class": "value-container",
-        "pointer-events": "none"
-    }).style({
-        visibility: "hidden"
-    }).append("text").attr({
-        "class": "value-label",
-        dx: 2,
-        dy: -4
-    });
-    valueGroup.exit().remove();
-    var lineGroup = config.panel.selectAll("g.line-container").data([ 0 ]);
-    lineGroup.enter().append("g").attr({
-        "class": "line-container",
-        "pointer-events": "none"
-    }).style({
-        visibility: "hidden"
-    }).append("line").attr({
-        "class": "tooltip-line"
-    });
-    lineGroup.exit().remove();
-    var valueLabel = valueGroup.select(".value-label");
-    var tooltipCircle = tooltipGroup.select(".tooltip-circle");
-    var tooltipLine = lineGroup.select(".tooltip-line");
-    config.eventPanel.on("mouseenter", function(d) {
-        tooltipGroup.style({
-            visibility: "visible"
-        });
-        valueGroup.style({
-            visibility: "visible"
-        });
-        tooltipLine.style({
-            visibility: "visible"
-        });
-    }).on("mouseout", function(d) {
-        tooltipGroup.style({
-            visibility: "hidden"
-        });
-        valueGroup.style({
-            visibility: "hidden"
-        });
-        tooltipLine.style({
-            visibility: "hidden"
-        });
-    }).on("mousemove", function(d, i) {
-        var mouse = d3.mouse(this);
-        var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
-        var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
-        var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
-        if (dataPointAtCursor) {
-            var xValue = dataPointAtCursor.x;
-            var value = dataPointAtCursor.y;
-            var x = config.scaleX(xValue);
-            var y = config.scaleY(value);
-            tooltipGroup.attr({
-                transform: "translate(" + [ x, y ] + ")"
-            });
-            valueGroup.attr({
-                transform: "translate(" + [ 0, y ] + ")"
-            });
-            valueLabel.text(value);
-            tooltipLine.attr({
-                x1: 0,
-                y1: y,
-                x2: x,
-                y2: y
-            });
-        }
-        config.dispatch.mousemove(dataPointAtCursor);
-    });
-    return {};
 };
 
 piper.axisXFormatterTime = function(_config) {
@@ -1082,19 +985,15 @@ piper.axisYFormatSI = function(_config) {
         axisY: null
     };
     piper.utils.override(config, _config);
-    config.axisY.tickFormat(function(d) {
-        var prefix = d3.formatPrefix(d);
-        var value = prefix.scale(d).toFixed();
-        return value + prefix.symbol;
-    });
+    config.axisY.tickFormat(d3.format(".2s"));
     return {};
 };
 
-piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.axisYFormatSI, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
+piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.scaleYExtent, piper.axisX, piper.axisY, piper.axisYFormatSI, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
 
 piper.areaChartTime = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.tooltipComponent);
 
-piper.areaChartTimeRotated = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.axisXFormatterTimeHour, piper.axisXFormatterRotate30, piper.hoverEvents, piper.HTMLTooltip, piper.hoverCircle);
+piper.areaChartTimeRotated = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.scaleYExtent, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.axisXFormatterTimeHour, piper.axisXFormatterRotate30, piper.hoverEvents, piper.HTMLTooltip, piper.hoverCircle);
 
 piper.areaChartFrom0 = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleYFrom0Padded, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentY, piper.thresholdLine, piper.thresholdLineLabel, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
 

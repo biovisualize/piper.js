@@ -1,4 +1,4 @@
-piper.tooltipWidget = function(tooltipNode) {
+piper.tooltipHTMLWidget = function(tooltipNode) {
     var root = d3.select(tooltipNode)
         .style({
             position: 'absolute',
