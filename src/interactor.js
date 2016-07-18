@@ -23,6 +23,9 @@ piper.eventsBinder = function(_config){
         .selectAll('g.event-panel-container')
         .data([0]);
 
+    this.dataConverted = config.dataConverted;
+    var that = this;
+
     eventPanelContainer.enter().append('g')
         .attr({
             'class': 'event-panel-container'
@@ -31,13 +34,15 @@ piper.eventsBinder = function(_config){
         .attr({
             'class': 'event-panel'
         })
-        .attr({
-            width: config.chartWidth,
-            height: config.chartHeight
-        })
         .style({
             visibility: 'hidden',
             'pointer-events': 'all'
+        });
+
+    eventPanelContainer.select('rect')
+        .attr({
+            width: config.chartWidth,
+            height: config.chartHeight
         })
         .on('mouseenter', function(d){
             piper.events.mouseenter({mouse: d3.mouse(this)});
@@ -54,7 +59,7 @@ piper.eventsBinder = function(_config){
             var absoluteOffsetTop = containerBBox.top;
 
             var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
-            var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
+            var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor.getTime());
             var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
             if(dataPointAtCursor){
                 var xValue = dataPointAtCursor.x;

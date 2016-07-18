@@ -113,6 +113,22 @@ piper.dataTime = function(_config) {
     };
 };
 
+piper.dataTimeFromSeparateArrays = function(_config) {
+    var config = {
+        data: null
+    };
+    piper.utils.override(config, _config);
+    var dataConverted = config.data.timestamps.map(function(d, i) {
+        return {
+            x: d.getTime(),
+            y: config.data.values[i]
+        };
+    });
+    return {
+        dataConverted: dataConverted
+    };
+};
+
 piper.dataGrouped = function(_config) {
     var config = {
         data: null
@@ -606,7 +622,7 @@ piper.hoverCircleComponent = function(_config) {
     piper.utils.override(config, piper.eventsBinder(config));
     var circleContainer = config.panel.selectAll("circle.hover-circle").data([ 0 ]);
     circleContainer.enter().append("circle").classed("hover-circle", true).attr({
-        r: 4
+        r: 3
     }).style({
         "pointer-events": "none",
         display: "none"
@@ -897,16 +913,19 @@ piper.eventsBinder = function(_config) {
     });
     var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0]);
     var eventPanelContainer = config.panel.selectAll("g.event-panel-container").data([ 0 ]);
+    this.dataConverted = config.dataConverted;
+    var that = this;
     eventPanelContainer.enter().append("g").attr({
         "class": "event-panel-container"
     }).append("rect").attr({
         "class": "event-panel"
-    }).attr({
-        width: config.chartWidth,
-        height: config.chartHeight
     }).style({
         visibility: "hidden",
         "pointer-events": "all"
+    });
+    eventPanelContainer.select("rect").attr({
+        width: config.chartWidth,
+        height: config.chartHeight
     }).on("mouseenter", function(d) {
         piper.events.mouseenter({
             mouse: d3.mouse(this)
@@ -923,7 +942,7 @@ piper.eventsBinder = function(_config) {
         var absoluteOffsetLeft = containerBBox.left;
         var absoluteOffsetTop = containerBBox.top;
         var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
-        var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
+        var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor.getTime());
         var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
         if (dataPointAtCursor) {
             var xValue = dataPointAtCursor.x;
@@ -1008,6 +1027,8 @@ piper.barChartPrumo = piper.utils.pipeline(piper.data, piper.barChartAutoConfig,
 piper.barChartGroupedPrumo = piper.utils.pipeline(piper.dataGrouped, piper.barChartAutoConfig, piper.scaleX, piper.scaleYGrouped, piper.axisX, piper.axisY, piper.panelComponent, piper.barShapesGrouped, piper.axisComponentX, piper.axisComponentY, piper.thresholdLine, piper.thresholdLineLabel, piper.axisTitleComponentY, piper.chartTitleComponent, piper.hoverEvents);
 
 piper.singleAxis = piper.utils.pipeline(piper.data, piper.scaleX, piper.axisX, piper.panelComponent, piper.singleAxisComponentX);
+
+piper.timeseriesLineChart = piper.utils.pipeline(piper.dataTimeFromSeparateArrays, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.lineShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentY, piper.tooltipComponent, piper.hoverCircleComponent, piper.tooltipLineComponent);
 
 if (typeof module === "object" && module.exports) {
     var d3 = require("d3");

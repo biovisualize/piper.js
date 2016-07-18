@@ -172,7 +172,7 @@ piper.hoverCircleComponent = function(_config){
         .data([0]);
     circleContainer.enter().append('circle').classed('hover-circle', true)
         .attr({
-            r: 4
+            r: 3
         })
         .style({
             'pointer-events': 'none',
