@@ -1,29 +1,23 @@
 {
-  "name": "piper.js",
+  "name": "rollup_test",
   "version": "0.1.0",
-  "description": "A pipeline pattern for datavis",
-  "keywords": [
-    "chart",
-    "pipeline"
-  ],
-  "homepage": "https://github.com/biovisualize/piper.js",
-  "license": "",
-  "author": {
-    "name": "Christophe Viau"
-  },
-  "main": "dist/pipeline.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/biovisualize/piper.js"
-  },
+  "description": "Trying Rollup.js",
+  "main": "index.js",
   "watch": {
-    "build": "src/*.js"
+    "build": {
+      "patterns": ["src", "."],
+      "extensions": "js,jsx",
+      "ignore": ["node_modules", "example", "build"]
+    }
   },
   "scripts": {
-    "build": "make",
+    "build": "rollup index.js -o build/piper.js -f umd -n piper",
     "watch": "npm-watch"
   },
+  "author": "Christophe Viau",
+  "license": "BSD-3-Clause",
   "devDependencies": {
-    "npm-watch": "^0.1.1"
+    "npm-watch": "^0.1.5",
+    "rollup": "^0.34.1"
   }
 }

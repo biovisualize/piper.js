@@ -2,76 +2,43 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script src="http://d3js.org/d3.v3.js"></script>
-<script src="../dist/piper.js"></script>
-<link rel="stylesheet" href="style.css" charset="utf-8">
+<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+<script src="../vendor/d3.v4.js"></script>
+<script src="../build/piper.js"></script>
+<style>
+
+</style>
 </head>
 <body>
 
-<div class="chart chart1"></div>
-<div class="chart chart2"></div>
-<div class="chart chart3"></div>
-<div class="tooltip">test</div>
+<div class="chart"></div>
+
 <script>
-// setInterval(function(d){
-//     render();
-// }, 1000);
 
-function render(){
-    var data = d3.range(~~(Math.random() * 20) + 5).map(function(d, i){ return ~~(Math.random() * 100); });
+    var dateNow = new Date().getTime();
+    var values = d3.range(10).map(function(d, i){ return ~~(Math.random() * 100); });
+    var timestamps = d3.range(10).map(function(d, i){ return dateNow + (i*60*60*1000); });
+    // var data = {values: values, timestamps: timestamps};
+    var data = d3.zip(timestamps, values);
 
-    var lineChart = piper.utils.pipeline(
-        piper.data,
-        piper.scaleX,
-        piper.scaleY,
-        piper.axisX,
-        piper.axisY,
-        piper.panelComponent,
-        piper.lineShapes,
-        piper.axisComponentX,
-        piper.axisComponentY,
-        piper.axisTitleComponentX,
-        piper.axisTitleComponentY,
-        piper.chartTitleComponent,
-        piper.eventsBinder,
-        piper.tooltipLineComponent,
-        piper.hoverCircleComponent,
-        piper.tooltipComponent
-    );
+    var chartContainer = document.querySelector('.chart');
 
-    var chartContainer = document.querySelector('.chart3');
-
-    var chart = lineChart({
+    var chart = piper({
             container: chartContainer,
             width: 400,
             height: 200,
             margin: {top: 50, right: 70, bottom: 35, left: 60},
-            data: data,
-            axisTitleX: 'Title X',
-            axisTitleY: 'Title Y',
-            chartTitle: 'Chart'
+            data: data
+            // axisTitleX: 'Title X',
+            // axisTitleY: 'Title Y',
+            // chartTitle: 'Chart',
+            // axisXFormat: d3.time.format("%H:%M"),
+            // tooltipFormat: function(d){
+                // var value = d.data.y;
+                // return (value % 1) ? value.toPrecision(3) : value;
+            // }
         });
 
-    var tooltip = piper.tooltipHTMLWidget(document.querySelector('.tooltip'));
-
-    chart.events.mouseenter.on(function(d){
-        tooltip.show();
-    });
-    chart.events.mouseout.on(function(d){
-        tooltip.hide();
-    });
-    chart.events.mousemove.on(function(d){
-        var chartPosition = chartContainer.getBoundingClientRect();
-        tooltip
-            .setText(d.data.y)
-            .setPosition([d.shapePositionFromContainer[0] + chartPosition.left, d.shapePositionFromContainer[1] + chartPosition.top]);
-    });
-
-}
-
-render();
-
 </script>
-
 </body>
 </html>
