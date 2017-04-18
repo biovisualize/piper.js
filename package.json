@@ -1,23 +1,31 @@
 {
-  "name": "rollup_test",
+  "name": "piper-chart",
   "version": "0.1.0",
-  "description": "Trying Rollup.js",
+  "description": "Chart example using a pipeline",
   "main": "index.js",
-  "watch": {
-    "build": {
-      "patterns": ["src", "."],
-      "extensions": "js,jsx",
-      "ignore": ["node_modules", "example", "build"]
-    }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biovisualize/piper.js.git"
   },
-  "scripts": {
-    "build": "rollup index.js -o build/piper.js -f umd -n piper",
-    "watch": "npm-watch"
-  },
+  "keywords": [
+    "chart",
+    "pipeline"
+  ],
   "author": "Christophe Viau",
-  "license": "BSD-3-Clause",
+  "license": "ISC",
+  "src": "src/start.js src/*utils.js src/*common.js src/*data.js src/*chart.js src/end.js",
+  "scripts": {
+    "build": "uglifyjs $npm_package_src -b --wrap datahub -o dist/datahub.js",
+    "build-watch": "npm-watch"
+  },
+  "homepage": "https://github.com/biovisualize/piper.js.git#readme",
+  "dependencies": {
+    "d3": "^4.4.0"
+  },
   "devDependencies": {
-    "npm-watch": "^0.1.5",
-    "rollup": "^0.34.1"
+    "npm-watch": "^0.1.8"
+  },
+  "watch": {
+    "build": "src/*.js",
   }
 }

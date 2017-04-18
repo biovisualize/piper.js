@@ -1,0 +1,19 @@
+.hidden {
+    visibility: hidden;
+}
+
+.datahub-chart .color-0 {
+    stroke: red;
+}
+
+.datahub-chart .color-1 {
+    stroke: orange;
+}
+
+.datahub-chart .color-2 {
+    stroke: lime;
+}
+
+.datahub-chart .axis.y .tick line{
+    pointer-events: none;
+}
