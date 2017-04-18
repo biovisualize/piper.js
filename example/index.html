@@ -8,14 +8,39 @@
     <link rel="stylesheet" href="../style/components.css" />
     <link rel="stylesheet" href="../style/dark-theme.css" />
     <style>
+    body {
+        background-color: white;
+        color: black;
+    }
+    a, a:visited {
+        color: black;
+    }
+    h1 {
+        text-align: center;
+    }
+    .chart {
+        width: 800px;
+    }
+    .content {
+        width: 800px;
+        margin: 0 auto;
+    }
     div {
         /*border: 1px solid silver;*/
+    }
+    .datahub-chart .stripe.even {
+        fill: #eee;
     }
     </style>
 </head>
 
 <body>
-    <div class="chart"></div>
+    <div class="content">
+        <h1>Piper.js</h1>
+        <p><a href="https://github.com/biovisualize/piper.js">Piper.js</a> is a simple pipeline pattern to structure <a href="https://medium.com/@christopheviau/d3-js-modularity-d5eed78ba06e">modular code</a> with D3.js. I'm using it at Planet OS to develop our charts library named <a href="https://medium.com/planet-os/insights-from-designing-datahub-ui-in-d3-js-d8f0f5da0b82">Datahub-ui.</a></p>
+    
+        <div class="chart"></div>
+    </div>
 
     <script>
 
@@ -24,7 +49,7 @@
         barData: datahub.data.generateTimeSeries({min: 100, max: 10000})
     }
 
-    var container = document.querySelector('.bar-chart')
+    var container = document.querySelector('.chart')
     datahub.multiChart({
         parent: container,
         width: container.clientWidth,
